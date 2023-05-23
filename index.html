@@ -31,7 +31,7 @@
 
       const filename = file.files[0].name
       const body = new FormData()
-      body.append('file', file.files[0])
+      body.append('file', file.files[0], filename)
       body.append('hash', hash.value)
       body.append('isNest', isNest.checked ? '1' : '')
 
@@ -47,7 +47,7 @@
       a.href = url
       a.download = filename
       a.textContent = 'signed ' + filename
-      output.append(a)
+      output.append(a, "\n")
     }
   </script>
 </body>

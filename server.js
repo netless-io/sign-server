@@ -74,12 +74,19 @@ const write = fs.promises.writeFile;
 // hash   = sha1 | sha256
 // isNest = () | 1
 async function sign({ file, hash, isNest }, res) {
-  console.log("Signing", file.name, hash, file.buffer.length);
+  const initSize = file.buffer.length;
+  console.log("Signing", file.name, hash, initSize);
 
   res.writeHead(200, { "Content-Type": "application/octet-stream" });
 
   // 1. Write to temp file.
   const dummy = Math.random().toString(36).slice(2);
+  const tmpdir = new URL(
+    join("node_modules/.sign-temp", dummy),
+    import.meta.url
+  );
+  fs.mkdirSync(tmpdir);
+
   const tmpfile = new URL(
     join("node_modules/.sign-temp", dummy, file.name),
     import.meta.url
@@ -90,15 +97,14 @@ async function sign({ file, hash, isNest }, res) {
   // signtool    = "path/to/signtool.exe"
   // certificate = { thumbprint: 'sha1', subject, store, isLocalMachine }
   const args = ["sign", "/debug"];
-  args.push(isNest || hash === "sha256" ? "/tr" : "/t");
-  args.push("http://timestamp.digicert.com");
+  args.push("/tr", "http://timestamp.digicert.com", "/td", "sha256");
 
   const { thumbprint, subject, store, isLocalMachine } = certificate;
   args.push("/sha1", thumbprint);
   args.push("/s", store);
   if (isLocalMachine) args.push("/sm");
 
-  if (hash !== "sha1") args.push("/fd", hash, "/td", "sha256");
+  args.push("/fd", hash);
 
   if (isNest) args.push("/as");
 
@@ -111,14 +117,20 @@ async function sign({ file, hash, isNest }, res) {
   } catch {
     // the file is being used by another process (maybe windows defender)
     // wait 15s and try again.
-    await new Promsie((resolve) => setTimeout(resolve, 15 * 1000));
+    await new Promise((resolve) => setTimeout(resolve, 15 * 1000));
     await exec(signtool, args, options);
   }
 
-  console.log("Signed", file.name, hash);
+  const newSize = fs.statSync(tmpfile).size;
+  const diff = newSize - initSize;
+  console.log("Signed", file.name, hash, newSize, (diff < 0 ? "" : "+") + diff);
 
   // 3. Pipe new file back.
-  fs.createReadStream(tmpfile).pipe(res, { end: true });
+  fs.createReadStream(tmpfile)
+    .once("end", () => {
+      fs.rmSync(tmpdir, { force: true, recursive: true });
+    })
+    .pipe(res, { end: true });
 }
 
 function index_html(res) {
