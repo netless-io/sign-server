@@ -76,3 +76,7 @@
 - [<samp>SignTool.exe (Sign Tool)</samp>](https://learn.microsoft.com/en-us/dotnet/framework/tools/signtool-exe)
 - [<samp>Integrate signing with Electron Builder</samp>](https://www.electron.build/tutorials/code-signing-windows-apps-on-unix#integrate-signing-with-electron-builder)
 - <samp>[app-builder-lib/src/codeSign/windowsCodeSign.ts](https://github.com/electron-userland/electron-builder/blob/-/packages/app-builder-lib/src/codeSign/windowsCodeSign.ts)</samp>
+
+## <samp>License</samp>
+
+<samp>The MIT license.</samp>
