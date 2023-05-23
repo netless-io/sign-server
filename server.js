@@ -50,7 +50,10 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/sign") {
     const body = await parseFormData(req);
     if (body) {
-      return sign(body, res);
+      return sign(body, res).catch((error) => {
+        res.statusCode = 400;
+        res.end(error.message);
+      });
     }
   }
 
@@ -76,8 +79,6 @@ const write = fs.promises.writeFile;
 async function sign({ file, hash, isNest }, res) {
   const initSize = file.buffer.length;
   console.log("Signing", file.name, hash, initSize);
-
-  res.writeHead(200, { "Content-Type": "application/octet-stream" });
 
   // 1. Write to temp file.
   const dummy = Math.random().toString(36).slice(2);
@@ -124,6 +125,8 @@ async function sign({ file, hash, isNest }, res) {
   const newSize = fs.statSync(tmpfile).size;
   const diff = newSize - initSize;
   console.log("Signed", file.name, hash, newSize, (diff < 0 ? "" : "+") + diff);
+
+  res.writeHead(200, { "Content-Type": "application/octet-stream" });
 
   // 3. Pipe new file back.
   fs.createReadStream(tmpfile)
