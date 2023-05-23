@@ -1,0 +1,9 @@
+{
+  "name": "@netless/sign-server",
+  "private": true,
+  "type": "module",
+  "config": {
+    "signtool": "// absolute path to signtool.exe, you can use / instead of \\ here",
+    "subject": "// certificate subject name, usually your company name"
+  }
+}

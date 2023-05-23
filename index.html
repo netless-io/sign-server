@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Tool</title>
+</head>
+<body style="line-height: 1.5;">
+  <label for="file">File to sign:</label>
+  <input id="file" type="file"><br>
+
+  <label for="hash">Digest method:</label>
+  <select id="hash">
+    <option value="sha1">sha1</option>
+    <option value="sha256">sha256</option>
+  </select><br>
+
+  <label for="isNest">Append signature:</label>
+  <input type="checkbox" id="isNest"><br>
+
+  <button id="submit">SUBMIT</button>
+  <div id="error"></div>
+  <div id="output"></div>
+
+  <script>
+    submit.onclick = async function submit() {
+      if (!file.files[0]) {
+        alert('no file!')
+        return;
+      }
+
+      const filename = file.files[0].name
+      const body = new FormData()
+      body.append('file', file.files[0])
+      body.append('hash', hash.value)
+      body.append('isNest', isNest.checked ? '1' : '')
+
+      const resp = await fetch('/sign', { method: 'POST', body })
+      if (!resp.ok) {
+        error.textContent = await resp.text()
+        return
+      }
+
+      const blob = await resp.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.textContent = 'signed ' + filename
+      output.append(a)
+    }
+  </script>
+</body>
+</html>
