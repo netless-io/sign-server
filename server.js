@@ -83,7 +83,7 @@ const server = http.createServer(async (req, res) => {
 
   // POST /exists "hash of file" => (json) true | false
   if (req.method === "POST" && req.url === "/exists") {
-    return send(req, 200, cache.has(await text(req)));
+    return send(res, 200, cache.has(await text(req)));
   }
 
   // POST /sign FormData { file, hash, isNest } => (octet-stream) signed file
