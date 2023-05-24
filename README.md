@@ -58,9 +58,9 @@
 
 ## <samp>3. Compose a sign.js for Electron Builder</samp>
 
-<samp>See the <a href="https://www.electron.build/tutorials/code-signing-windows-apps-on-unix#integrate-signing-with-electron-builder" target="_blank">doc</a> about using custom signning.</samp>
+<samp>See the <a href="https://www.electron.build/tutorials/code-signing-windows-apps-on-unix#integrate-signing-with-electron-builder" target="_blank">doc</a> about using custom signing.</samp>
 
-<samp>See the example <a href="./sign.js">sign.js</a>, remember to replace the {local-ip} with the real IP address.</samp>
+<samp>See the <a href="./example-sign.js">example sign.js</a>, remember to replace the {local-ip} with the real IP address.</samp>
 
 <samp><strong>Note</strong>: You need at least Node.js 18 to run the electron builder because this script uses the native fetch() API to upload files to the server. If you don't have one, you can import {fetch, FormData} from <a href="https://www.npmjs.com/package/undici" target="_blank">"undici"</a>.</samp>
 
