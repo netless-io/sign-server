@@ -1,7 +1,13 @@
 // The server provides a /sign API that returns signed file.
 // Caches are stored at node_modules/.sign-temp, here's how the cache works:
+// There are 2 levels of file cache:
+// 1. All user uploaded files (isNest = false) are cached.
+// 2. Signed files are cached.
+// When isNest is false, this file will be preserved as long as possible;
+// Signed files and those with isNest = true will be deleted after the job.
+// Because the code signing includes a timestamp, it makes different files at each time.
 //
-// upload-fast(file content hash):
+// exists(file content hash):
 //    return exists node_modules/.sign-temp/{file content hash}
 //
 // sign(file = hash or blob, method = sha1):
@@ -105,6 +111,7 @@ const server = http.createServer(async (req, res) => {
   res.end();
 });
 
+cache.clear();
 server.listen({ host: "0.0.0.0", port: 3000 }, () => {
   // stolen from npm:local-access
   let k, tmp;
